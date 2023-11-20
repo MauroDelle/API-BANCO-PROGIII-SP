@@ -1,0 +1,15 @@
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+CREATE TABLE Cuentas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    tipoDocumento VARCHAR(20) NOT NULL,
+    nroDocumento VARCHAR(20) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    tipoCuenta VARCHAR(20) NOT NULL,
+    saldoInicial DECIMAL(10, 2) NOT NULL,
+    estado BOOLEAN NOT NULL
+);
