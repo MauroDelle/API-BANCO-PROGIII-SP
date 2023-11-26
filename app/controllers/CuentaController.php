@@ -121,10 +121,6 @@ class CuentaController extends Cuenta implements IInterfazAPI
                 $actualizado = true;
                 $cuenta->setTipoCuenta($parametros['tipoCuenta']);
             }
-            if (isset($parametros['saldoInicial'])) {
-                $actualizado = true;
-                $cuenta->setSaldoInicial($parametros['saldoInicial']);
-            }
             if (isset($parametros['estado'])) {
                 $actualizado = true;
                 $cuenta->setEstado($parametros['estado']);
@@ -145,6 +141,8 @@ class CuentaController extends Cuenta implements IInterfazAPI
             ->withHeader('Content-Type', 'application/json');
     }
     #endregion
+
+
 
 
 }

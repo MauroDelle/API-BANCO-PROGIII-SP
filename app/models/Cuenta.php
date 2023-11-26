@@ -137,7 +137,7 @@ class Cuenta implements Ipersistencia
         $query->bindValue(":nroDocumento", $cuenta->getNroDocumento(), PDO::PARAM_STR);
         $query->bindValue(":email", $cuenta->getEmail(), PDO::PARAM_STR);
         $query->bindValue(":tipoCuenta", $cuenta->getTipoCuenta(), PDO::PARAM_STR);
-        $query->bindValue(":saldoInicial", $cuenta->getSaldoInicial(), PDO::PARAM_STR);
+        $query->bindValue(":saldoInicial", $cuenta->getSaldoInicial());
         $query->bindValue(":estado", $cuenta->getEstado(), PDO::PARAM_BOOL);
 
         $query->execute();
@@ -163,7 +163,7 @@ class Cuenta implements Ipersistencia
         return $query->fetchObject('Cuenta');
     }
 
-    
+
     public static function modificar($cuenta)
     {
         $objDataAccess = DataAccess::getInstance();
@@ -180,7 +180,23 @@ class Cuenta implements Ipersistencia
         $consulta->execute();
     }
 
-    #enregion
+    public function actualizarSaldo($cuenta,$importe)
+    {
+        // var_dump($cuenta->saldoInicial);
+        $cuenta->saldoInicial += $importe;
+        // var_dump($cuenta->saldoInicial);
+        // var_dump($cuenta->id);
+
+        $objDataAccess = DataAccess::getInstance();
+        $query = $objDataAccess->prepareQuery('UPDATE Cuentas SET saldoInicial = :saldoInicial WHERE id = :id AND estado = true');
+        $query->bindValue(':id', $cuenta->id, PDO::PARAM_INT);
+        $query->bindValue(':saldoInicial', $cuenta->saldoInicial);
+        $query->execute();
+    }
+
+    #endregion
+
+
 
 
 }
