@@ -138,7 +138,7 @@ class DepositoController extends Deposito implements IInterfazAPI
             $uploadedFiles['foto']->moveTo($targetPath);
 
             // Actualizar saldo en la cuenta
-            $cuenta->actualizarSaldo($cuenta,$importe);
+            Cuenta::actualizarSaldo($cuenta,$importe);
     
             $payload = json_encode(array("mensaje" => "Deposito realizado con exito"));
         } else {
@@ -173,8 +173,6 @@ class DepositoController extends Deposito implements IInterfazAPI
 
         return $response->withHeader('Content-Type', 'application/json');
     }
-
-
 
 }
 ?>

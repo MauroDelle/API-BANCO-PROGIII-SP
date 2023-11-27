@@ -9,7 +9,6 @@ require_once './Interfaces/IInterfazAPI.php';
 
 class CuentaController extends Cuenta implements IInterfazAPI
 {
-
     #region CRUD
     public static function CargarUno($request, $response, $args)
     {
@@ -77,7 +76,7 @@ class CuentaController extends Cuenta implements IInterfazAPI
 
         if (Cuenta::obtenerUno($id)) {
             Cuenta::borrar($id);
-            $payload = json_encode(array("mensaje" => "Cuenta borrada con éxito"));
+            $payload = json_encode(array("mensaje" => "Cuenta borrada con exito"));
         } else {
             $payload = json_encode(array("mensaje" => "ID no coincide con una cuenta"));
         }

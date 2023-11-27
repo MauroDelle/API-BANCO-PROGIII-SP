@@ -15,6 +15,8 @@ require_once './db/DataAccess.php';
 require_once './controllers/UsuarioController.php';
 require_once './middlewares/Logger.php';
 require_once './controllers/DepositoController.php';
+require_once './controllers/AjusteController.php';
+require_once './controllers/RetiroController.php';
 // Carga el archivo .env con la configuracion de la BD.
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
@@ -61,7 +63,29 @@ $app->group('/cuenta', function (RouteCollectorProxy $group) {
     $group->get('/{cuenta}', \DepositoController::class . '::TraerUno');
     $group->get('/tipo/{tipoCuenta}', \DepositoController::class . '::BuscarTipoCuenta');
     $group->get('/moneda/{moneda}', \DepositoController::class . '::BuscarMoneda');
+    $group->get('/retiro/tipo/{tipoCuenta}', \RetiroController::class . '::BuscarTipoCuenta');
+    $group->get('/retiro/{retiro}/', \RetiroController::class . '::TraerUno');
+    $group->get('/retiro/[/]', \RetiroController::class . '::TraerTodos');
   });
+
+  $app->group('/retiro', function (RouteCollectorProxy $group) {
+    $group->post('[/]', \RetiroController::class . '::Retirar');
+    // $group->put('/{id}', \CuentaController::class . '::ModificarUno');
+    // $group->get('/{tipoCuenta}/{nroCuenta}', \CuentaController::class . '::obtenerMonedaYSaldo');
+    // $group->delete('/{id}', \CuentaController::class . '::BorrarUno');
+    $group->get('[/]', \RetiroController::class . '::TraerTodos');
+    $group->get('/{retiro}', \RetiroController::class . '::TraerUno');
+  });
+
+  $app->group('/ajuste', function (RouteCollectorProxy $group) {
+    $group->post('[/]', \AjusteController::class . '::RealizarAjuste');
+    // $group->put('/{id}', \CuentaController::class . '::ModificarUno');
+    // $group->get('/{tipoCuenta}/{nroCuenta}', \CuentaController::class . '::obtenerMonedaYSaldo');
+    // $group->delete('/{id}', \CuentaController::class . '::BorrarUno');
+    $group->get('[/]', \RetiroController::class . '::TraerTodos');
+    $group->get('/{retiro}', \RetiroController::class . '::TraerUno');
+  });
+
 
 
   $app->group('/admin', function (RouteCollectorProxy $group) {

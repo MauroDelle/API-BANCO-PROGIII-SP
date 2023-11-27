@@ -180,13 +180,27 @@ class Cuenta implements Ipersistencia
         $consulta->execute();
     }
 
-    public function actualizarSaldo($cuenta,$importe)
+    public static function actualizarSaldo($cuenta,$importe)
     {
         // var_dump($cuenta->saldoInicial);
+        var_dump("actualizarSaldo");
         $cuenta->saldoInicial += $importe;
         // var_dump($cuenta->saldoInicial);
         // var_dump($cuenta->id);
+        $objDataAccess = DataAccess::getInstance();
+        $query = $objDataAccess->prepareQuery('UPDATE Cuentas SET saldoInicial = :saldoInicial WHERE id = :id AND estado = true');
+        $query->bindValue(':id', $cuenta->id, PDO::PARAM_INT);
+        $query->bindValue(':saldoInicial', $cuenta->saldoInicial);
+        $query->execute();
+    }
 
+    public static function actualizarSaldoRetiro($cuenta,$importe)
+    {
+        // var_dump($cuenta->saldoInicial);
+        var_dump("actualizarSaldo");
+        $cuenta->saldoInicial -= $importe;
+        // var_dump($cuenta->saldoInicial);
+        // var_dump($cuenta->id);
         $objDataAccess = DataAccess::getInstance();
         $query = $objDataAccess->prepareQuery('UPDATE Cuentas SET saldoInicial = :saldoInicial WHERE id = :id AND estado = true');
         $query->bindValue(':id', $cuenta->id, PDO::PARAM_INT);
@@ -196,6 +210,20 @@ class Cuenta implements Ipersistencia
 
     #endregion
 
+
+    public function actualizarSaldoAjuste($ajuste) {
+        // Verifica el tipo de transacción y actualiza el saldo en consecuencia
+
+        switch ($ajuste->tipoTransaccion) {
+            case "retiro":
+                var_dump("Llegue");
+                $this->saldoInicial += $ajuste->monto;
+                break;
+            case "deposito":
+                $this->saldoInicial -= $ajuste->monto;
+                break;
+        }
+    }
 
 
 
