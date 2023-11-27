@@ -40,7 +40,7 @@ $app->group('/login', function (RouteCollectorProxy $group) {
 $app->group('/cuenta', function (RouteCollectorProxy $group) {
     $group->post('[/]', \CuentaController::class . '::CargarUno');
     $group->put('/{id}', \CuentaController::class . '::ModificarUno');
-    $group->get('/{tipoCuenta}/{nroCuenta}', \CuentaController::class . '::obtenerMonedaYSaldo');
+    // $group->get('/{tipoCuenta}/{nroCuenta}', \CuentaController::class . '::obtenerMonedaYSaldo');
     $group->delete('/{id}', \CuentaController::class . '::BorrarUno');
     $group->get('[/]', \CuentaController::class . '::TraerTodos');
     $group->get('/{cuenta}', \CuentaController::class . '::TraerUno');
@@ -49,7 +49,7 @@ $app->group('/cuenta', function (RouteCollectorProxy $group) {
   $app->group('/deposito', function (RouteCollectorProxy $group) {
     $group->post('[/]', \DepositoController::class . '::Depositar');
     // $group->put('/{id}', \CuentaController::class . '::ModificarUno');
-    // $group->get('/{tipoCuenta}/{nroCuenta}', \CuentaController::class . '::obtenerMonedaYSaldo');
+     $group->get('/porTipo/{tipoCuenta}', \DepositoController::class . '::BuscarTipoCuenta');
     // $group->delete('/{id}', \CuentaController::class . '::BorrarUno');
     $group->get('[/]', \DepositoController::class . '::TraerTodos');
     $group->get('/{cuenta}', \DepositoController::class . '::TraerUno');

@@ -167,10 +167,28 @@ class Cuenta implements Ipersistencia
     public static function modificar($cuenta)
     {
         $objDataAccess = DataAccess::getInstance();
-        $query = $objDataAccess->prepareQuery('UPDATE Cuentas SET nombre = :nombre, tipoCuenta = :tipoCuenta WHERE id = :id AND estado = true');
+    
+        $query = $objDataAccess->prepareQuery('
+            UPDATE Cuentas 
+            SET nombre = :nombre, 
+                apellido = :apellido, 
+                tipoDocumento = :tipoDocumento, 
+                nroDocumento = :nroDocumento, 
+                email = :email, 
+                tipoCuenta = :tipoCuenta, 
+                estado = :estado
+            WHERE id = :id
+        ');
+    
         $query->bindValue(':id', $cuenta->getId(), PDO::PARAM_INT);
         $query->bindValue(':nombre', $cuenta->getNombre(), PDO::PARAM_STR);
+        $query->bindValue(':apellido', $cuenta->getApellido(), PDO::PARAM_STR);
+        $query->bindValue(':tipoDocumento', $cuenta->getTipoDocumento(), PDO::PARAM_STR);
+        $query->bindValue(':nroDocumento', $cuenta->getNroDocumento(), PDO::PARAM_STR);
+        $query->bindValue(':email', $cuenta->getEmail(), PDO::PARAM_STR);
         $query->bindValue(':tipoCuenta', $cuenta->getTipoCuenta(), PDO::PARAM_STR);
+        $query->bindValue(':estado', $cuenta->getEstado(), PDO::PARAM_STR);
+    
         $query->execute();
     }
     public static function borrar($id) {

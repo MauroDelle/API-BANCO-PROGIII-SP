@@ -92,7 +92,7 @@ class AjusteController extends Ajuste implements IInterfazAPI
             // Agrega el resto de los campos de la clase Ajuste según sea necesario
     
             if ($actualizado) {
-                $ajuste->modificarEnBD();
+                $ajuste->modificar();
                 $payload = json_encode(array("mensaje" => "Ajuste modificado con éxito"));
             } else {
                 $payload = json_encode(array("mensaje" => "Ajuste no modificado por falta de campos"));

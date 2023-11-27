@@ -89,8 +89,8 @@ class CuentaController extends Cuenta implements IInterfazAPI
     public static function ModificarUno($request, $response, $args)
     {
         $id = $args['id'];
-
         $cuenta = Cuenta::obtenerUno($id);
+        var_dump($cuenta);
 
         if ($cuenta != false) {
             $parametros = $request->getParsedBody();
@@ -126,7 +126,8 @@ class CuentaController extends Cuenta implements IInterfazAPI
             }
 
             if ($actualizado) {
-                $cuenta->modificarEnBD();
+                var_dump($cuenta);
+                Cuenta::modificar($cuenta);
                 $payload = json_encode(array("mensaje" => "Cuenta modificada con éxito"));
             } else {
                 $payload = json_encode(array("mensaje" => "Cuenta no modificada por falta de campos"));
