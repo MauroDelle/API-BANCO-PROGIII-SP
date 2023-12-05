@@ -106,28 +106,43 @@ class RetiroController extends Retiro implements IInterfazAPI
         $params = $request->getParsedBody();
         $idCuenta = $params['idCuenta'];
         $monto = $params['monto'];
-        $tipoCuenta = $params['tipoCuenta'];
-
+        // $tipoCuenta = $params['tipoCuenta'];
+    
         // Verificar si la cuenta existe
         $cuenta = Cuenta::obtenerUno($idCuenta);
-        var_dump($cuenta);
-
-        if ($cuenta && $cuenta->estado == true) {
-            // Realizar el depósito y actualizar el saldo
-            $retiro = new Retiro();
-            $retiro->idCuenta = $idCuenta;
-            $retiro->monto = $monto;
-            $retiro->tipoCuenta = $tipoCuenta;
-            $retiro->setFecha(date('Y-m-d H:i:s'));
-            Retiro::crear($retiro);
-            
-            // Actualizar saldo en la cuenta
-            $retiro->actualizarSaldoRetiro($cuenta,$monto);
     
-            $payload = json_encode(array("mensaje" => "Retiro realizado con exito"));
+        if ($cuenta && $cuenta->estado == true) {
+            // Verificar si el monto del retiro es mayor que el saldo de la cuenta
+            if ($monto > $cuenta->saldoInicial) {
+                $payload = json_encode(array("mensaje" => "El monto del retiro es mayor que el saldo de la cuenta"));
+            } else {
+                // Realizar el retiro y actualizar el saldo
+                $retiro = new Retiro();
+                $retiro->idCuenta = $idCuenta;
+                $retiro->monto = $monto;
+                // $retiro->tipoCuenta = $tipoCuenta;
+                $retiro->setFecha(date('Y-m-d H:i:s'));
+                Retiro::crear($retiro);
+    
+                $header = $request->getHeaderLine(("Authorization"));
+                $token = trim(explode("Bearer", $header)[1]);
+                $data = AutentificadorJWT :: ObtenerData($token);
+        
+                
+                $acceso = new Acceso();
+                $acceso->idUsuario = $data->id;
+                $acceso->fechaHora = date('Y-m-d H:i:s');
+                $acceso->tipoTransaccion = "RETIRO";
+                Acceso::crear($acceso);
+                
+                // Actualizar saldo en la cuenta
+                $retiro->actualizarSaldoRetiro($cuenta,$monto);
+        
+                $payload = json_encode(array("mensaje" => "Retiro realizado con exito"));
+            }
         } else {
             // La cuenta no existe, informar el error
-            $payload = json_encode(array("mensaje" => "Retiro no modificado por que no esta activo"));
+            $payload = json_encode(array("mensaje" => "Retiro no modificado porque la cuenta no está activa"));
         }
         $response->getBody()->write($payload);
         return $response

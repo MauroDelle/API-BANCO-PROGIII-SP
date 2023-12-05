@@ -131,6 +131,7 @@ class Ajuste implements Ipersistencia
                     $ajuste->motivo = $motivo;
                     $ajuste->monto = $monto;
 
+
                     Cuenta::actualizarSaldo($cuenta,$monto);
 
                     Ajuste::crear($ajuste);
@@ -147,24 +148,23 @@ class Ajuste implements Ipersistencia
         else if($tipoTransaccion  === "deposito")
         {
             $deposito = Deposito::obtenerUno($idDepositoRetiro);
-            // var_dump($deposito);
             if($deposito)
             {
                 $cuenta = Cuenta::obtenerUno($deposito->numeroCuenta);
-                var_dump($cuenta);
 
                 if ($cuenta && $cuenta->estado == true)
                 {
-                    var_dump("Llegue");
+
                     $ajuste = new Ajuste();
                     $ajuste->tipoTransaccion = $tipoTransaccion;
                     $ajuste->idDepositoRetiro = $idDepositoRetiro;
                     $ajuste->motivo = $motivo;
                     $ajuste->monto = $monto;
 
+                    var_dump($ajuste);
+                    Ajuste::crear($ajuste);
                     Cuenta::actualizarSaldo($cuenta,$monto);
 
-                    Ajuste::crear($ajuste);
 
                     return true;
                 }else {
@@ -175,32 +175,6 @@ class Ajuste implements Ipersistencia
                 echo 'No existe un numero de extraccion/retiro bajo el numero: ' . $idDepositoRetiro . '<br>';
             }
         }
-        return false;
-    }
-
-    public static function aplicarAjusteSobreRetiro($motivo,$monto,$retiro,$tipoTransaccion)
-    {
-        if($retiro)
-        {
-            $cuenta = Cuenta::obtenerUno($retiro->idRetiro);
-            var_dump($cuenta);
-            if($cuenta)
-            {
-                var_dump("hola");
-                Cuenta::actualizarSaldo($cuenta,$monto);
-                $ajuste = new Ajuste();
-                $ajuste->motivo = $motivo;
-                $ajuste->monto = $monto;
-                $ajuste->tipoTransaccion = $tipoTransaccion;
-                Ajuste::crear($ajuste);
-                return true;
-              
-            }
-        }
-        else{
-            echo 'El monto del ajuste es mayor al valor de ese retiro.<br>'; 
-        }
-
         return false;
     }
 

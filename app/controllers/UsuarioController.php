@@ -6,6 +6,7 @@ use Slim\Http\Response;
 require_once './models/Usuario.php';
 require_once './Interfaces/IInterfazAPI.php';
 require_once './middlewares/AutentificadorJWT.php';
+require_once './models/Accesos.php';
 
 class UsuarioController extends Usuario implements IInterfazAPI
 {
@@ -120,6 +121,7 @@ class UsuarioController extends Usuario implements IInterfazAPI
 
     $data = array('id' => $usuario->id, 'mail' => $usuario->mail, 'tipo' => $usuario->tipo, 'clave' => $usuario->clave);
     $creacion = AutentificadorJWT::CrearToken($data);
+  
 
     $response = $response->withHeader('Set-Cookie', 'token=' . $creacion['jwt']);
 

@@ -5,6 +5,8 @@ use Slim\Http\Response;
 
 require_once './models/Cuenta.php';
 require_once './Interfaces/IInterfazAPI.php';
+require_once './models/Accesos.php';
+require_once './middlewares/AutentificadorJWT.php';
 #endregion
 
 class CuentaController extends Cuenta implements IInterfazAPI
@@ -51,6 +53,16 @@ class CuentaController extends Cuenta implements IInterfazAPI
     public static function TraerUno($request, $response, $args)
     {
         $cuentaId = $args['cuenta'];
+        $header = $request->getHeaderLine(("Authorization"));
+        $token = trim(explode("Bearer", $header)[1]);
+        $data = AutentificadorJWT :: ObtenerData($token);
+
+        
+        $acceso = new Acceso();
+        $acceso->idUsuario = $data->id;
+        $acceso->fechaHora = date('Y-m-d H:i:s');
+        $acceso->tipoTransaccion = "Consulta-GET";
+        Acceso::crear($acceso);
 
         $cuenta = Cuenta::obtenerUno($cuentaId);
         $payload = json_encode($cuenta);
@@ -64,6 +76,18 @@ class CuentaController extends Cuenta implements IInterfazAPI
     {
         $lista = Cuenta::obtenerTodos();
         $payload = json_encode(array("listaCuentas" => $lista));
+
+        $header = $request->getHeaderLine(("Authorization"));
+        $token = trim(explode("Bearer", $header)[1]);
+        $data = AutentificadorJWT :: ObtenerData($token);
+
+        
+        $acceso = new Acceso();
+        $acceso->idUsuario = $data->id;
+        $acceso->fechaHora = date('Y-m-d H:i:s');
+        $acceso->tipoTransaccion = "Consulta-GET";
+        Acceso::crear($acceso);
+
 
         $response->getBody()->write($payload);
         return $response

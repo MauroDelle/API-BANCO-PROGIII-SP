@@ -17,6 +17,9 @@ require_once './middlewares/Logger.php';
 require_once './controllers/DepositoController.php';
 require_once './controllers/AjusteController.php';
 require_once './controllers/RetiroController.php';
+require_once './middlewares/Autentificador.php';
+
+
 // Carga el archivo .env con la configuracion de la BD.
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->safeLoad();
@@ -29,63 +32,50 @@ $app->addBodyParsingMiddleware();
 
 #endregion
 
-#region app->group
 
+#region app->group
 // LOG IN 
 $app->group('/login', function (RouteCollectorProxy $group) {
   $group->post('[/]', \UsuarioController::class . '::LogIn')->add(\Logger::class . '::ValidarLogin');
 });
 
-
 $app->group('/cuenta', function (RouteCollectorProxy $group) {
-    $group->post('[/]', \CuentaController::class . '::CargarUno');
-    $group->put('/{id}', \CuentaController::class . '::ModificarUno');
-    // $group->get('/{tipoCuenta}/{nroCuenta}', \CuentaController::class . '::obtenerMonedaYSaldo');
-    $group->delete('/{id}', \CuentaController::class . '::BorrarUno');
-    $group->get('[/]', \CuentaController::class . '::TraerTodos');
-    $group->get('/{cuenta}', \CuentaController::class . '::TraerUno');
+    $group->post('[/]', \CuentaController::class . '::CargarUno')->add(\Autentificador::class . '::ValidarAdmin');
+    $group->put('/{id}', \CuentaController::class . '::ModificarUno')->add(\Autentificador::class . '::ValidarAdmin');
+    $group->delete('/{id}', \CuentaController::class . '::BorrarUno')->add(\Autentificador::class . '::ValidarAdmin');
+    $group->get('[/]', \CuentaController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarOperador');
+    $group->get('/{cuenta}', \CuentaController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarOperador');
   });
 
   $app->group('/deposito', function (RouteCollectorProxy $group) {
-    $group->post('[/]', \DepositoController::class . '::Depositar');
-    // $group->put('/{id}', \CuentaController::class . '::ModificarUno');
-     $group->get('/porTipo/{tipoCuenta}', \DepositoController::class . '::BuscarTipoCuenta');
-    // $group->delete('/{id}', \CuentaController::class . '::BorrarUno');
-    $group->get('[/]', \DepositoController::class . '::TraerTodos');
-    $group->get('/{cuenta}', \DepositoController::class . '::TraerUno');
+    $group->post('[/]', \DepositoController::class . '::Depositar')->add(\Autentificador::class . '::ValidarCajero');
+     $group->get('/porTipo/{tipoCuenta}', \DepositoController::class . '::BuscarTipoCuenta')->add(\Autentificador::class . '::ValidarCajero');
+    $group->get('[/]', \DepositoController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarCajero');
+    $group->get('/{cuenta}', \DepositoController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarCajero');
   });
 
-
   $app->group('/consultas', function (RouteCollectorProxy $group) {
-    // $group->put('/{id}', \CuentaController::class . '::ModificarUno');
-    // $group->get('/{tipoCuenta}/{nroCuenta}', \CuentaController::class . '::obtenerMonedaYSaldo');
-    // $group->delete('/{id}', \CuentaController::class . '::BorrarUno');
-    $group->get('/{cuenta}', \DepositoController::class . '::TraerUno');
-    $group->get('/tipo/{tipoCuenta}', \DepositoController::class . '::BuscarTipoCuenta');
-    $group->get('/moneda/{moneda}', \DepositoController::class . '::BuscarMoneda');
-    $group->get('/retiro/tipo/{tipoCuenta}', \RetiroController::class . '::BuscarTipoCuenta');
+    $group->get('[/]', \CuentaController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarOperador');
+    $group->get('/{cuenta}', \CuentaController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarOperador');
+    //$group->get('/{cuenta}', \DepositoController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarOperador');
+
+    $group->get('/deposito/[/]', \DepositoController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarOperador');
+    //$group->get('/{cuenta}', \DepositoController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarCajero');
     $group->get('/retiro/{retiro}/', \RetiroController::class . '::TraerUno');
     $group->get('/retiro/[/]', \RetiroController::class . '::TraerTodos');
   });
 
   $app->group('/retiro', function (RouteCollectorProxy $group) {
-    $group->post('[/]', \RetiroController::class . '::Retirar');
-    // $group->put('/{id}', \CuentaController::class . '::ModificarUno');
-    // $group->get('/{tipoCuenta}/{nroCuenta}', \CuentaController::class . '::obtenerMonedaYSaldo');
-    // $group->delete('/{id}', \CuentaController::class . '::BorrarUno');
-    $group->get('[/]', \RetiroController::class . '::TraerTodos');
-    $group->get('/{retiro}', \RetiroController::class . '::TraerUno');
+    $group->post('[/]', \RetiroController::class . '::Retirar')->add(\Autentificador::class . '::ValidarCajero');
+    $group->get('[/]', \RetiroController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarCajero');
+    $group->get('/{retiro}', \RetiroController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarCajero');
   });
 
   $app->group('/ajuste', function (RouteCollectorProxy $group) {
-    $group->post('[/]', \AjusteController::class . '::RealizarAjuste');
-    // $group->put('/{id}', \CuentaController::class . '::ModificarUno');
-    // $group->get('/{tipoCuenta}/{nroCuenta}', \CuentaController::class . '::obtenerMonedaYSaldo');
-    // $group->delete('/{id}', \CuentaController::class . '::BorrarUno');
-    $group->get('[/]', \RetiroController::class . '::TraerTodos');
-    $group->get('/{retiro}', \RetiroController::class . '::TraerUno');
+    $group->post('[/]', \AjusteController::class . '::RealizarAjuste')->add(\Autentificador::class . '::ValidarAdmin');
+    $group->get('[/]', \RetiroController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarAdmin');;
+    $group->get('/{retiro}', \RetiroController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarAdmin');;
   });
-
 
 
   $app->group('/admin', function (RouteCollectorProxy $group) {

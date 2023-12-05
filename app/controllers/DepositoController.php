@@ -2,6 +2,7 @@
 use Slim\Http\Request;
 use Slim\Http\Response;
 
+require_once './models/Accesos.php';
 require_once './models/Deposito.php';
 require_once './Interfaces/IInterfazAPI.php';
 require_once './models/Cuenta.php';
@@ -119,7 +120,7 @@ class DepositoController extends Deposito implements IInterfazAPI
 
         // Verificar si la cuenta existe
         $cuenta = Cuenta::obtenerUno($numeroCuenta);
-        // var_dump($cuenta);
+        
 
         if ($cuenta && $cuenta->estado == true) {
             // Realizar el depósito y actualizar el saldo
@@ -132,7 +133,18 @@ class DepositoController extends Deposito implements IInterfazAPI
             Deposito::crear($deposito);
             $contadorDepositos = 0;
             $contadorDepositos++;
+
+            $header = $request->getHeaderLine(("Authorization"));
+            $token = trim(explode("Bearer", $header)[1]);
+            $data = AutentificadorJWT :: ObtenerData($token);
+    
             
+            $acceso = new Acceso();
+            $acceso->idUsuario = $data->id;
+            $acceso->fechaHora = date('Y-m-d H:i:s');
+            $acceso->tipoTransaccion = "DEPOSITO";
+            Acceso::crear($acceso);
+    
 
             $targetPath = './ImagenesDepositos2023/' . $cuenta->id . '-' . $contadorDepositos . '.jpg';
             $uploadedFiles['foto']->moveTo($targetPath);

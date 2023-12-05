@@ -42,6 +42,15 @@ class AjusteController extends Ajuste implements IInterfazAPI
     {
         $lista = Ajuste::obtenerTodos();
         $payload = json_encode(array("listaAjustes" => $lista));
+        $header = $request->getHeaderLine(("Authorization"));
+        $token = trim(explode("Bearer", $header)[1]);
+        $data = AutentificadorJWT :: ObtenerData($token);
+        
+        $acceso = new Acceso();
+        $acceso->idUsuario = $data->id;
+        $acceso->fechaHora = date('Y-m-d H:i:s');
+        $acceso->tipoTransaccion = "Consulta-GET-Ajuste";
+        Acceso::crear($acceso);
     
         $response->getBody()->write($payload);
         return $response
@@ -107,40 +116,35 @@ class AjusteController extends Ajuste implements IInterfazAPI
     }
 
     public static function RealizarAjuste($request,$response,$args)
-    {
-        $params = $request->getParsedBody();
-        $motivo = $params['motivo'];
-        $monto = $params['monto'];
-        $tipoTransaccion = $params['tipoTransaccion'];
-        $idDepositoRetiro = $params['idDepositoRetiro'];
-
-        
-
-        $ajuste = Ajuste::generarAjuste($motivo,$monto,$tipoTransaccion,$idDepositoRetiro);
-
-        if ($idDepositoRetiro) {
-            // Realizar el ajuste
-            // $ajuste = new Ajuste();
-            // $ajuste->setIdDepositoRetiro($numeroExtraccionDeposito);
-            // $ajuste->setMotivo($motivo);
+{
+    $params = $request->getParsedBody();
+    $motivo = $params['motivo'];
+    $monto = $params['monto'];
+    $tipoTransaccion = $params['tipoTransaccion'];
+    $idDepositoRetiro = $params['idDepositoRetiro'];
+    $header = $request->getHeaderLine(("Authorization"));
+    $token = trim(explode("Bearer", $header)[1]);
+    $data = AutentificadorJWT :: ObtenerData($token);
     
-            // Ajuste::crear($ajuste); // Suponiendo que existe un método crear en la clase Ajuste
-    
-            // // Actualizar saldo en la cuenta
-            // $cuenta = Cuenta::obtenerUno($extraccionDepositoExistente->getIdCuenta());
-            // $nuevoSaldo = $cuenta->getSaldo() - $extraccionDepositoExistente->getMonto(); // Ajuste, puedes cambiar la lógica según sea necesario
-            // $cuenta->actualizarSaldo($nuevoSaldo);
-    
-            $payload = json_encode(array("mensaje" => "Ajuste realizado con éxito"));
-        } else {
-            $payload = json_encode(array("error" => "Número de extracción o depósito no encontrado"));
-        }
-    
-        $response->getBody()->write($payload);
-        return $response
-            ->withHeader('Content-Type', 'application/json');
+    $acceso = new Acceso();
+    $acceso->idUsuario = $data->id;
+    $acceso->fechaHora = date('Y-m-d H:i:s');
+    $acceso->tipoTransaccion = "AJUSTE";
+    Acceso::crear($acceso);
 
+    $ajusteExitoso = Ajuste::generarAjuste($motivo,$monto,$tipoTransaccion,$idDepositoRetiro);
+
+
+    if ($ajusteExitoso) {
+        $payload = json_encode(array("mensaje" => "Ajuste realizado con exito"));
+    } else {
+        $payload = json_encode(array("error" => "No se pudo realizar el ajuste"));
     }
+
+    $response->getBody()->write($payload);
+    return $response
+        ->withHeader('Content-Type', 'application/json');
+}
 
 
 }

@@ -214,8 +214,6 @@ class Cuenta implements Ipersistencia
 
     public static function actualizarSaldoRetiro($cuenta,$importe)
     {
-        // var_dump($cuenta->saldoInicial);
-        var_dump("actualizarSaldo");
         $cuenta->saldoInicial -= $importe;
         // var_dump($cuenta->saldoInicial);
         // var_dump($cuenta->id);
