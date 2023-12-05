@@ -32,8 +32,19 @@ class DepositoController extends Deposito implements IInterfazAPI
     }
     public static function TraerUno($request, $response, $args)
     {
-        $cuentaId = $args['cuenta'];
-        $cuenta = Cuenta::obtenerUno($cuentaId);
+        $cuentaId = $args['deposito'];
+        $cuenta = Deposito::obtenerUno($cuentaId);
+
+        $header = $request->getHeaderLine(("Authorization"));
+        $token = trim(explode("Bearer", $header)[1]);
+        $data = AutentificadorJWT :: ObtenerData($token);
+
+        
+        $acceso = new Acceso();
+        $acceso->idUsuario = $data->id;
+        $acceso->fechaHora = date('Y-m-d H:i:s');
+        $acceso->tipoTransaccion = "Consulta-GET-Depositos";
+        Acceso::crear($acceso);
     
         if ($cuenta) {
             $payload = json_encode($cuenta);
@@ -48,6 +59,17 @@ class DepositoController extends Deposito implements IInterfazAPI
     {
         $lista = Deposito::obtenerTodos();
         $payload = json_encode(array("listaDepositos" => $lista));
+
+        $header = $request->getHeaderLine(("Authorization"));
+        $token = trim(explode("Bearer", $header)[1]);
+        $data = AutentificadorJWT :: ObtenerData($token);
+
+        
+        $acceso = new Acceso();
+        $acceso->idUsuario = $data->id;
+        $acceso->fechaHora = date('Y-m-d H:i:s');
+        $acceso->tipoTransaccion = "Consulta-GET-Depositos";
+        Acceso::crear($acceso);
     
         $response->getBody()->write($payload);
         return $response

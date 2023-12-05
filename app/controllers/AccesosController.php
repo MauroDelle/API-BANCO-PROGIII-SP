@@ -2,6 +2,7 @@
 
 require_once './models/Accesos.php';
 require_once './Interfaces/IInterfazAPI.php';
+require_once './models/CSV.php';
 
 class AccesoController extends Acceso implements IInterfazAPI
 {
@@ -43,6 +44,33 @@ class AccesoController extends Acceso implements IInterfazAPI
     public static function TraerTodos($request, $response, $args){}
     public static function BorrarUno($request, $response, $args){}
     public static function ModificarUno($request, $response, $args){}
+
+    public function ExportarOperaciones($request, $response, $args)
+    {
+        try
+        {
+            $archivo = CSV::ExportarCSV("operaciones.csv");
+            if(file_exists($archivo) && filesize($archivo) > 0)
+            {
+                $payload = json_encode(array("Archivo creado:" => $archivo));
+            }
+            else
+            {
+                $payload = json_encode(array("Error" => "Datos ingresados invalidos."));
+            }
+            $response->getBody()->write($payload);
+        }
+        catch(Exception $e)
+        {
+            echo $e;
+        }
+        finally
+        {
+            return $response->withHeader('Content-Type', 'text/csv');
+        }    
+    }
+
+
 }
 
 

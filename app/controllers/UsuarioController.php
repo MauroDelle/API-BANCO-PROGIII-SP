@@ -112,6 +112,21 @@ class UsuarioController extends Usuario implements IInterfazAPI
       ->withHeader('Content-Type', 'application/json');
   }
 
+  public static function Logout($request, $response, $args)
+  {
+      // Obtén el token del encabezado de la solicitud
+      $header = $request->getHeaderLine(("Authorization"));
+      $token = trim(explode("Bearer", $header)[1]);
+  
+      setcookie($token, '', time() - 3600, "/"); 
+  
+      $payload = json_encode(array("mensaje" => "Cierre de sesion exitoso"));
+      $response->getBody()->write($payload);
+      return $response
+          ->withHeader('Content-Type', 'application/json');
+  }
+  
+
   public static function LogIn($request, $response, $args)
   {
     $parametros = $request->getParsedBody();

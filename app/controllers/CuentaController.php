@@ -85,7 +85,7 @@ class CuentaController extends Cuenta implements IInterfazAPI
         $acceso = new Acceso();
         $acceso->idUsuario = $data->id;
         $acceso->fechaHora = date('Y-m-d H:i:s');
-        $acceso->tipoTransaccion = "Consulta-GET";
+        $acceso->tipoTransaccion = "Consulta-GET-Cuentas";
         Acceso::crear($acceso);
 
 

@@ -28,6 +28,17 @@ class RetiroController extends Retiro implements IInterfazAPI
     {
         $idRetiro = $args['retiro'];
         $retiro = Retiro::obtenerUno($idRetiro);
+
+        $header = $request->getHeaderLine(("Authorization"));
+        $token = trim(explode("Bearer", $header)[1]);
+        $data = AutentificadorJWT :: ObtenerData($token);
+
+        
+        $acceso = new Acceso();
+        $acceso->idUsuario = $data->id;
+        $acceso->fechaHora = date('Y-m-d H:i:s');
+        $acceso->tipoTransaccion = "Consulta-GET-Retiros";
+        Acceso::crear($acceso);
     
         if ($retiro) {
             $payload = json_encode($retiro);
@@ -42,6 +53,16 @@ class RetiroController extends Retiro implements IInterfazAPI
     {
         $lista = Retiro::obtenerTodos();
         $payload = json_encode(array("listaRetiros" => $lista));
+
+        $header = $request->getHeaderLine(("Authorization"));
+        $token = trim(explode("Bearer", $header)[1]);
+        $data = AutentificadorJWT :: ObtenerData($token);
+        
+        $acceso = new Acceso();
+        $acceso->idUsuario = $data->id;
+        $acceso->fechaHora = date('Y-m-d H:i:s');
+        $acceso->tipoTransaccion = "Consulta-GET-Retiros";
+        Acceso::crear($acceso);
     
         $response->getBody()->write($payload);
         return $response
@@ -106,7 +127,7 @@ class RetiroController extends Retiro implements IInterfazAPI
         $params = $request->getParsedBody();
         $idCuenta = $params['idCuenta'];
         $monto = $params['monto'];
-        // $tipoCuenta = $params['tipoCuenta'];
+        $tipoCuenta = $params['tipoCuenta'];
     
         // Verificar si la cuenta existe
         $cuenta = Cuenta::obtenerUno($idCuenta);
@@ -120,7 +141,7 @@ class RetiroController extends Retiro implements IInterfazAPI
                 $retiro = new Retiro();
                 $retiro->idCuenta = $idCuenta;
                 $retiro->monto = $monto;
-                // $retiro->tipoCuenta = $tipoCuenta;
+                 $retiro->tipoCuenta = $tipoCuenta;
                 $retiro->setFecha(date('Y-m-d H:i:s'));
                 Retiro::crear($retiro);
     

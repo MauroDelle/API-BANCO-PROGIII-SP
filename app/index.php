@@ -13,6 +13,7 @@ require __DIR__ . '/../vendor/autoload.php';
 require_once './controllers/CuentaController.php';
 require_once './db/DataAccess.php';
 require_once './controllers/UsuarioController.php';
+require_once './controllers/AccesosController.php';
 require_once './middlewares/Logger.php';
 require_once './controllers/DepositoController.php';
 require_once './controllers/AjusteController.php';
@@ -39,42 +40,37 @@ $app->group('/login', function (RouteCollectorProxy $group) {
   $group->post('[/]', \UsuarioController::class . '::LogIn')->add(\Logger::class . '::ValidarLogin');
 });
 
+$app->group('/logout', function (RouteCollectorProxy $group) {
+  $group->post('[/]', \UsuarioController::class . '::Logout');
+});
+
+
 $app->group('/cuenta', function (RouteCollectorProxy $group) {
     $group->post('[/]', \CuentaController::class . '::CargarUno')->add(\Autentificador::class . '::ValidarAdmin');
     $group->put('/{id}', \CuentaController::class . '::ModificarUno')->add(\Autentificador::class . '::ValidarAdmin');
     $group->delete('/{id}', \CuentaController::class . '::BorrarUno')->add(\Autentificador::class . '::ValidarAdmin');
     $group->get('[/]', \CuentaController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarOperador');
     $group->get('/{cuenta}', \CuentaController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarOperador');
+    $group->get('/csv/', \AccesoController::class . ':ExportarOperaciones');
   });
 
   $app->group('/deposito', function (RouteCollectorProxy $group) {
     $group->post('[/]', \DepositoController::class . '::Depositar')->add(\Autentificador::class . '::ValidarCajero');
-     $group->get('/porTipo/{tipoCuenta}', \DepositoController::class . '::BuscarTipoCuenta')->add(\Autentificador::class . '::ValidarCajero');
-    $group->get('[/]', \DepositoController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarCajero');
-    $group->get('/{cuenta}', \DepositoController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarCajero');
-  });
-
-  $app->group('/consultas', function (RouteCollectorProxy $group) {
-    $group->get('[/]', \CuentaController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarOperador');
-    $group->get('/{cuenta}', \CuentaController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarOperador');
-    //$group->get('/{cuenta}', \DepositoController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarOperador');
-
-    $group->get('/deposito/[/]', \DepositoController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarOperador');
-    //$group->get('/{cuenta}', \DepositoController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarCajero');
-    $group->get('/retiro/{retiro}/', \RetiroController::class . '::TraerUno');
-    $group->get('/retiro/[/]', \RetiroController::class . '::TraerTodos');
+    // $group->get('/porTipo/{tipoCuenta}', \DepositoController::class . '::BuscarTipoCuenta')->add(\Autentificador::class . '::ValidarCajero');
+    $group->get('/consulta/[/]', \DepositoController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarCajero');
+    $group->get('/consulta/{deposito}', \DepositoController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarCajero');
   });
 
   $app->group('/retiro', function (RouteCollectorProxy $group) {
     $group->post('[/]', \RetiroController::class . '::Retirar')->add(\Autentificador::class . '::ValidarCajero');
-    $group->get('[/]', \RetiroController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarCajero');
-    $group->get('/{retiro}', \RetiroController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarCajero');
+    $group->get('/consulta/[/]', \RetiroController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarCajero');
+    $group->get('/consulta/{retiro}', \RetiroController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarCajero');
   });
 
   $app->group('/ajuste', function (RouteCollectorProxy $group) {
     $group->post('[/]', \AjusteController::class . '::RealizarAjuste')->add(\Autentificador::class . '::ValidarAdmin');
-    $group->get('[/]', \RetiroController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarAdmin');;
-    $group->get('/{retiro}', \RetiroController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarAdmin');;
+    $group->get('/consulta/[/]', \AjusteController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarOperador');
+    $group->get('/consulta/{ajuste}', \AjusteController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarOperador');
   });
 
 

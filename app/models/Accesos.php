@@ -71,7 +71,7 @@ class Acceso implements Ipersistencia
             $query = $objDataAccess->prepareQuery("SELECT idTransaccion, idUsuario, fechaHora, tipoTransaccion FROM Transacciones");
             $query->execute();
 
-            return $query->fetchAll(PDO::FETCH_CLASS, "Transaccion");
+            return $query->fetchAll(PDO::FETCH_CLASS, "Acceso");
         }
 
         public static function obtenerUno($id)
@@ -87,6 +87,7 @@ class Acceso implements Ipersistencia
         public static function modificar($objeto){}
         
         public static function borrar($objeto){}
+
 
 
 
