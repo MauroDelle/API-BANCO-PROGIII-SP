@@ -70,6 +70,36 @@ class AccesoController extends Acceso implements IInterfazAPI
         }    
     }
 
+    public function ExportarOperacionesPDF($request, $response, $args)
+    {
+        
+        $orden = $args['orden'];
+
+        try
+        {
+            $archivo = CSV::ExportarPDF("operaciones.pdf", $orden);
+            if(file_exists($archivo) && filesize($archivo) > 0)
+            {
+                $payload = json_encode(array("Archivo creado:" => $archivo));
+            }
+            else
+            {
+                $payload = json_encode(array("Error" => "Datos ingresados invalidos."));
+            }
+            $response->getBody()->write($payload);
+        }
+        catch(Exception $e)
+        {
+            echo $e;
+        }
+        finally
+        {
+            return $response->withHeader('Content-Type', 'text/csv');
+        }    
+    }
+
+
+
 
 }
 

@@ -3,6 +3,14 @@
       "slim/slim": "^4.12",
       "slim/psr7": "^1.6",
       "vlucas/phpdotenv": "^5.5",
-      "firebase/php-jwt":"4.0"
+      "fpdf/fpdf": "^1.83",
+      "firebase/php-jwt":"4.0",
+    "extcode/tcpdf": "^0.4.0",
+    "setasign/fpdf": "^1.8"
+  },
+  "config": {
+    "allow-plugins": {
+      "typo3/cms-composer-installers": true
+    }
   }
 }

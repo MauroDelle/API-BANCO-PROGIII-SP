@@ -44,14 +44,17 @@ $app->group('/logout', function (RouteCollectorProxy $group) {
   $group->post('[/]', \UsuarioController::class . '::Logout');
 });
 
-
 $app->group('/cuenta', function (RouteCollectorProxy $group) {
     $group->post('[/]', \CuentaController::class . '::CargarUno')->add(\Autentificador::class . '::ValidarAdmin');
     $group->put('/{id}', \CuentaController::class . '::ModificarUno')->add(\Autentificador::class . '::ValidarAdmin');
     $group->delete('/{id}', \CuentaController::class . '::BorrarUno')->add(\Autentificador::class . '::ValidarAdmin');
     $group->get('[/]', \CuentaController::class . '::TraerTodos')->add(\Autentificador::class . '::ValidarOperador');
     $group->get('/{cuenta}', \CuentaController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarOperador');
-    $group->get('/csv/', \AccesoController::class . ':ExportarOperaciones');
+    $group->get('/csv/', \AccesoController::class . ':ExportarOperaciones')->add(\Autentificador::class . '::ValidarAdmin');
+  });
+
+  $app->group('/exportarPDF', function (RouteCollectorProxy $group) {
+    $group->get('/{orden}', \AccesoController::class . ':ExportarOperacionesPDF')->add(\Autentificador::class . '::ValidarAdmin');
   });
 
   $app->group('/deposito', function (RouteCollectorProxy $group) {
@@ -73,7 +76,6 @@ $app->group('/cuenta', function (RouteCollectorProxy $group) {
     $group->get('/consulta/{ajuste}', \AjusteController::class . '::TraerUno')->add(\Autentificador::class . '::ValidarOperador');
   });
 
-
   $app->group('/admin', function (RouteCollectorProxy $group) {
     $group->get('[/]', function ($request, $response, $args) {
       $user = new Usuario();
@@ -89,7 +91,6 @@ $app->group('/cuenta', function (RouteCollectorProxy $group) {
         ->withHeader('Content-Type', 'application/json');
     });
   }); 
-
 
 #endregion
 

@@ -27,6 +27,16 @@ class CuentaController extends Cuenta implements IInterfazAPI
         $estado = $params['estado'];
         $idAleatorio = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
         $idCuenta = $idAleatorio . $tipoCuenta;
+
+        $header = $request->getHeaderLine(("Authorization"));
+        $token = trim(explode("Bearer", $header)[1]);
+        $data = AutentificadorJWT :: ObtenerData($token);
+        
+        $acceso = new Acceso();
+        $acceso->idUsuario = $data->id;
+        $acceso->fechaHora = date('Y-m-d H:i:s');
+        $acceso->tipoTransaccion = "ALTA-CUENTA";
+        Acceso::crear($acceso);
         
         $targetPath = './ImagenesCuentas2023/' . $idCuenta . '.jpg';
         $uploadedFiles['foto']->moveTo($targetPath);
